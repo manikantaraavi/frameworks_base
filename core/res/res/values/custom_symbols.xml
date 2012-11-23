@@ -61,4 +61,8 @@
 
    <!-- QQS Height -->
     <java-symbol type="dimen" name="quick_qs_total_height" />
+
+    <!-- Button backlight -->
+    <java-symbol type="integer" name="config_deviceSupportsButtonBrightnessControl" />
+    <java-symbol type="dimen" name="config_buttonBrightnessSettingDefaultFloat" />
 </resources>
