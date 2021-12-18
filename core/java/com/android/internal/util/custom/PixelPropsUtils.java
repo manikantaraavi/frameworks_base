@@ -32,6 +32,7 @@ public class PixelPropsUtils {
     private static final boolean DEBUG = false;
 
     private static final Map<String, Object> propsToChangePixel6;
+    private static final Map<String, Object> propsToChangePixelXL;
 
     private static final Map<String, Object> propsToChangePixel5;
     private static final String[] packagesToChangePixel5 = {
@@ -40,11 +41,10 @@ public class PixelPropsUtils {
             "com.google.android.apps.recorder"
     };
 
-    private static final Map<String, Object> propsToChangePixelXL;
     private static final String[] packagesToChangePixelXL = {
             "com.google.android.apps.photos"
     };
-
+    
     private static final Map<String, ArrayList<String>> propsToKeep;
     private static final String[] extraPackagesToChange = {
             "com.android.chrome",
@@ -96,11 +96,18 @@ public class PixelPropsUtils {
             if (Arrays.asList(packagesToChangePixel5).contains(packageName)) {
                 propsToChange = propsToChangePixel5;
             }
-
-            if (Arrays.asList(packagesToChangePixelXL).contains(packageName)) {
-                propsToChange = propsToChangePixelXL;
+            
+            if (Arrays.asList(packagesToChangePixelXL).contains(packageName)){
+                if (DEBUG){
+                Log.d(TAG, "Defining props for: " + packageName);
             }
-
+            for (Map.Entry<String, Object> prop : propsToChangePixelXL.entrySet()) {
+                String key = prop.getKey();
+                Object value = prop.getValue();
+                setPropValue(key, value);
+            }
+        }
+        
             if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
             for (Map.Entry<String, Object> prop : propsToChange.entrySet()) {
                 String key = prop.getKey();
