@@ -27,6 +27,7 @@
     <string name="status_bar_camera">Camera</string>
     <string name="status_bar_location">Location</string>
     <string name="status_bar_microphone">Microphone</string>
+    <string name="status_bar_call_strength">Call strength</string>
 
    <!-- Caffeine QS Tile -->
     <string name="quick_settings_caffeine_label">Caffeine</string>
