@@ -86,4 +86,10 @@
     <!-- Face Unlock -->
     <string name="face_unlock_recognizing">Recognizing face...</string>
 
+    <!-- Label for area where tiles can be dragged out of [CHAR LIMIT=60] -->
+    <string name="drag_to_add_tiles">Hold and drag or tap to add tiles</string>
+
+    <!-- Label for header of customize QS [CHAR LIMIT=60] -->
+    <string name="drag_to_rearrange_tiles">Hold and drag or tap to rearrange tiles</string>
+
 </resources>
