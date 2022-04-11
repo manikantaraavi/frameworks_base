@@ -342,6 +342,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
     private SensorPrivacyManager mSensorPrivacyManager;
     private int mFaceAuthUserId;
 
+    private boolean mFingerprintWakeAndUnlock;
+
     /**
      * Short delay before restarting fingerprint authentication after a successful try. This should
      * be slightly longer than the time between onFingerprintAuthenticated and
@@ -2300,7 +2302,18 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         final int user = getCurrentUser();
         final boolean userDoesNotHaveTrust = !getUserHasTrust(user);
         final boolean shouldListenForFingerprintAssistant = shouldListenForFingerprintAssistant();
-        final boolean shouldListenKeyguardState =
+        final boolean shouldListenKeyguardState;
+        if (!mFingerprintWakeAndUnlock) {
+            shouldListenKeyguardState =
+                (mKeyguardIsVisible
+                        || mBouncer
+                        || shouldListenForFingerprintAssistant
+                        || (mKeyguardOccluded && mIsDreaming))
+                        && mDeviceInteractive && !mGoingToSleep && !mKeyguardGoingAway
+                        || (mKeyguardOccluded && userDoesNotHaveTrust
+                            && (mOccludingAppRequestingFp || isUdfps));
+        } else {
+            shouldListenKeyguardState =
                 mKeyguardIsVisible
                         || !mDeviceInteractive
                         || (mBouncer && !mKeyguardGoingAway)
@@ -2309,6 +2322,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                         || (mKeyguardOccluded && mIsDreaming)
                         || (mKeyguardOccluded && userDoesNotHaveTrust
                             && (mOccludingAppRequestingFp || isUdfps));
+        }
 
         // Only listen if this KeyguardUpdateMonitor belongs to the primary user. There is an
         // instance of KeyguardUpdateMonitor for each user but KeyguardUpdateMonitor is user-aware.
@@ -3464,6 +3478,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.FACE_UNLOCK_METHOD), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.FP_WAKE_UNLOCK), false, this,
+                    UserHandle.USER_ALL);
             updateSettings();
         }
 
@@ -3475,13 +3492,16 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
 
     private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
-        if (mFaceAuthOnlyOnSecurityView){
+        if (mFaceAuthOnlyOnSecurityView) {
             mFaceUnlockBehavior = FACE_UNLOCK_BEHAVIOR_SWIPE;
-        }else{
+        } else {
             mFaceUnlockBehavior = Settings.Secure.getIntForUser(resolver,
                 Settings.Secure.FACE_UNLOCK_METHOD, FACE_UNLOCK_BEHAVIOR_DEFAULT,
                 UserHandle.USER_CURRENT);
         }
+        mFingerprintWakeAndUnlock = Settings.System.getIntForUser(resolver,
+                Settings.System.FP_WAKE_UNLOCK, 0,
+                UserHandle.USER_CURRENT) == 0;
     }
 
     /**
